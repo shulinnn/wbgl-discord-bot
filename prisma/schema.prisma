@@ -24,8 +24,21 @@ model User {
   played_events Event[]
   organizer_at  Event[]  @relation("eventOrganizer")
   matches       Match[]
+  Stats         Stats[]
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
+}
+
+model Stats {
+  id         Int      @id @default(autoincrement())
+  human      Int[]    @default([0, 0])
+  orc        Int[]    @default([0, 0])
+  undead     Int[]    @default([0, 0])
+  night_elf  Int[]    @default([0, 0])
+  created_at DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id])
+  updated_at DateTime @updatedAt
+  userId     Int
 }
 
 enum EventType {
@@ -34,11 +47,17 @@ enum EventType {
   Tournament
 }
 
+enum EventAvailability {
+  Private
+  Public
+}
+
 enum Race {
   Orc
   Undead
   NightElf
   Human
+  TBA
 }
 
 enum Map {
@@ -47,35 +66,46 @@ enum Map {
   Map3
 }
 
+enum EventStatus {
+  Scheduled
+  Ongoing
+  Cancelled
+}
+
 enum MatchType {
   BO1
-  BO2
-  BO3
-  BO4
-  BO5
 }
 
 model Event {
-  id         Int       @id @default(autoincrement())
-  name       String    @unique
-  banner     String
-  event_type EventType
-  start_at   DateTime
-  matches    Match[]
-  players    User[]
-  organizer  User      @relation("eventOrganizer", fields: [userId], references: [id])
-  userId     Int
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
+  id                   Int               @id @default(autoincrement())
+  name                 String            @unique
+  banner               String
+  event_type           EventType
+  event_availability   EventAvailability
+  channel_category_id  BigInt?
+  channel_id           BigInt?
+  start_at             DateTime
+  event_status         EventStatus       @default(Scheduled)
+  player_role_color    String
+  organizer_role_color String
+  player_role_id       BigInt?
+  organizer_role_id    BigInt?
+  matches              Match[]
+  players              User[]
+  organizer            User              @relation("eventOrganizer", fields: [userId], references: [id])
+  userId               Int
+  created_at           DateTime          @default(now())
+  updated_at           DateTime          @updatedAt
 }
 
 model Match {
   id         Int       @id @default(autoincrement())
   players    User[]
-  races      Race[]
+  races      Race[]    @default([TBA, TBA])
   score      Int[]
   match_type MatchType
-  map        Map[]
+  channel_id BigInt
+  map        Map
   Event      Event?    @relation(fields: [eventId], references: [id])
   eventId    Int?
   created_at DateTime  @default(now())

@@ -2,6 +2,9 @@ const { REST, Routes } = require("discord.js");
 const fs = require("node:fs");
 const path = require("node:path");
 const dotenv = require("dotenv");
+const { Logger } = require("./utils/messages/logger");
+
+const logger = new Logger();
 
 dotenv.config();
 
@@ -23,7 +26,7 @@ for (const folder of commandFolders) {
     if ("data" in command && "execute" in command) {
       commands.push(command.data.toJSON());
     } else {
-      console.log(
+      logger.warning(
         `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
       );
     }
@@ -31,25 +34,25 @@ for (const folder of commandFolders) {
 }
 
 // Construct and prepare an instance of the REST module
-const rest = new REST().setToken(process.env.token);
+const rest = new REST().setToken(process.env.discord_token);
 
 // and deploy your commands!
 (async () => {
   try {
-    console.log(
+    logger.log(
       `Started refreshing ${commands.length} application (/) commands.`
     );
 
     // The put method is used to fully refresh all commands in the guild with the current set
     const data = await rest.put(
       Routes.applicationGuildCommands(
-        process.env.application_id,
+        process.env.app_id,
         process.env.server_id
       ),
       { body: commands }
     );
 
-    console.log(
+    logger.log(
       `Successfully reloaded ${data.length} application (/) commands.`
     );
   } catch (error) {

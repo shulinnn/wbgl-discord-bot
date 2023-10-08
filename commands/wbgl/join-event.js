@@ -1,29 +1,14 @@
-const { PrismaClient } = require("@prisma/client");
 const { SlashCommandBuilder } = require("discord.js");
-const { GetRolesForEvent } = require("../../utils/GetRoleForEvent");
 const {
-  DidItStart,
-  GetEventStartTime,
-} = require("../../utils/HasEventStarted");
+  JoinEventCommandOptions,
+} = require("$/command-options/JoinEventCommandOptions.js");
+
 const {
   EventAlreadyStartedError,
-  EventNotFoundError,
-  EventAlreadyJoinedError,
-} = require("../../utils/messages/errors");
-const { JoinEventCommandOptions } = require("../../utils/utils");
+} = require("$/errors/EventAlreadyStartedError");
 
-const prisma = new PrismaClient();
-
-async function DoesEventExist(eventName) {
-  const res = await prisma.event.findFirst({
-    where: {
-      name: eventName,
-    },
-  });
-
-  if (res == null) return false;
-  else return true;
-}
+const { EventNotFoundError } = require("$/errors/EventNotFoundError");
+const { EventAlreadyJoinedError } = require("$/errors/EventAlreadyJoinedError");
 
 module.exports = {
   data: new SlashCommandBuilder()

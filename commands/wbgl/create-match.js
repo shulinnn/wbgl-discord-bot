@@ -4,19 +4,19 @@ const {
   PermissionFlagsBits,
   ChannelType,
 } = require("discord.js");
+
+const { MatchSamePlayersError } = require("$/errors/MatchSamePlayersError");
 const {
-  MatchSamePlayersError,
   MatchChannelCreationError,
-  MatchCreateError,
-  ChannelCategoryNotFoundError,
-  MatchFetchPlayersError,
-  EventNotFoundError,
-} = require("../../utils/messages/errors");
-const { RandomRaceGenerator } = require("../../utils/RandomRaceGen");
+} = require("$/errors/MatchChannelCreationError");
+const { MatchCreateError } = require("$/errors/MatchCreateError");
 const {
-  BigIntToNumber,
-  CreateMatchCommandOptions,
-} = require("../../utils/utils");
+  ChannelCategoryNotFoundError,
+} = require("$/errors/ChannelCategoryNotFoundError");
+const { MatchFetchPlayersError } = require("$/errors/MatchFetchPlayersError");
+const { EventNotFoundError } = require("$/errors/EventNotFoundError");
+
+const { BigIntToNumber } = require("$/utils/utils");
 
 const prisma = new PrismaClient();
 
@@ -79,13 +79,10 @@ module.exports = {
       })
     );
 
-    if (createMatchCommandOptions.event === null)
+    if (!createMatchCommandOptions.doesExist())
       throw new EventNotFoundError(interaction);
 
-    if (
-      createMatchCommandOptions.players.player1 ===
-      createMatchCommandOptions.players.player2
-    )
+    if (createMatchCommandOptions.arePlayersSame())
       throw new MatchSamePlayersError(interaction);
 
     createMatchCommandOptions.setPlayers(
@@ -108,8 +105,8 @@ module.exports = {
     if (createMatchCommandOptions.players === null)
       throw new MatchFetchPlayersError(interaction);
 
-    if (createMatchCommandOptions.racesBool)
-      createMatchCommandOptions.setRaces(await RandomRaceGenerator());
+    if (createMatchCommandOptions.areRacesRandom())
+      createMatchCommandOptions.generaceRaces();
     else createMatchCommandOptions.setRaces([Race.TBA, Race.TBA]);
 
     createMatchCommandOptions.setChannelCategory(

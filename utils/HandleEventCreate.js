@@ -11,7 +11,7 @@ async function handleEventCreate(interaction) {
 
   if (!wbglGuild.available)
     console.log(
-      "Somewthing is wrong, our guild is not available.Probably server outage ?"
+      "Something is wrong, our guild is not available.Probably server outage ?"
     );
 
   ///here we should create roles for participant and organizer

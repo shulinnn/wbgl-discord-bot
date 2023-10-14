@@ -112,7 +112,7 @@ async function handleEventCreate(interaction) {
       break;
   }
 
-  if (IsEventPublic(interaction)) {
+  if (interaction.options.getString("event-availability") === "Public") {
     // send embed
     await interaction.editReply({
       embeds: [CreateLeagueEmbedMessage(interaction)],

@@ -46,10 +46,10 @@ async function handleEventCreate(interaction) {
       },
     })
     .then(async (e) => {
-      const roles = await GetRolesForEvent(
-        interaction.options.getString("event-name")
-      );
-
+      const roles = {
+        organizer : organizerRole.id,
+        player : playerRole.id
+      }
       interaction.member.roles.add(roles.organizer);
     })
     .catch(console.error);
